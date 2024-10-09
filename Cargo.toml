@@ -4,8 +4,11 @@ unsafe_code = "forbid"
 [workspace]
 resolver = "2"
 members = [
+    "crates/libs/lib-core",
+    "crates/libs/lib-web",
     # -- Application Services
     "crates/services/web-server",
+    "crates/tests/it",
 ]
 
 # NOTE: Only the crates that are utilized in two or more sub-crates and benefit from global management
