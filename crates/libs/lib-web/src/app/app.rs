@@ -11,74 +11,31 @@ use java_properties::read;
 use tokio_postgres::{Client, NoTls};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use common_pet_structs::book::book::{Book, Books};
-use common_pet_structs::user::user::User;
-use repository::user::user_repository::UserRepository;
+use lib_core::context::app_context::AppContext;
 
-use crate::context::app_context::AppContext;
-use crate::repository::book::book_repository::BookRepository;
 
-mod service;
-mod context;
-mod repository;
-mod test;
-
-#[tokio::main]
-async fn main() {
+pub async fn create_app_context() -> Arc<AppContext> {
     let db_url = read_db_url("local.properties");
     let client = get_client(db_url).await;
 
     let app_context: Arc<AppContext> = Arc::new(AppContext::create(Arc::new(client)).await);
 
-    app_context.user_repository().init().await;
-    app_context.book_repository().init().await;
-
-    let app = app_nils(app_context).await;
-
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    app_context
 }
 
-async fn app_nils(app_context: Arc<AppContext>) -> Router {
+pub async fn app_nils(app_context: Arc<AppContext>) -> Router {
     Router::new()
-        .route("/create-user", post(create_user))
-        .route("/create-book", post(create_book))
         .route("/get-books", get(get_books))
         .with_state(app_context)
 }
 
-async fn create_user(
-    State(app_context): State<Arc<AppContext>>,
-    Json(payload): Json<User>,
-) {
-    println!("{:?}", payload);
-
-    let mut user_repo: &UserRepository = app_context.user_repository();
-
-    user_repo.insert_user(payload).await;
-}
-
-async fn create_book(
-    State(app_context): State<Arc<AppContext>>,
-    Json(payload): Json<Book>,
-) {
-    println!("{:?}", payload);
-
-    let mut book_repo: &BookRepository = app_context.book_repository();
-
-    let res = book_repo.insert_book(payload).await.unwrap();
-
-    println!("{:?}", res)
-}
 
 async fn get_books(
     State(app_context): State<Arc<AppContext>>,
-) -> Result<Json<Books>, StatusCode> {
+) -> Result<String, StatusCode> {
     println!("{:?}", "get books");
 
-    let mut book_repo: &BookRepository = app_context.book_repository();
-
-    Ok(Json::from(book_repo.get_books().await.unwrap()))
+    Ok("res".to_string())
 }
 
 async fn get_client(db_url: String) -> Client {

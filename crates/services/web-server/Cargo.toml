@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 # -- App Libs
+lib-core = { path = "../../libs/lib-core"}
+lib-web = { path = "../../libs/lib-web"}
 
 # -- Async
 tokio = { version = "1", features = ["full"] }

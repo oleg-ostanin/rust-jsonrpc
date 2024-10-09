@@ -1,8 +1,16 @@
+use std::sync::Arc;
 use axum::Error;
 
+use lib_core::context::app_context::AppContext;
+use lib_web::app::app::create_app_context;
+use lib_web::app::app::app_nils;
+
 #[tokio::main]
-async fn main() -> Result<(), Error> {
-  let v = vec!(1, 2, 3);
-  let s = &v[..];
-  Ok(())
+async fn main() {
+  let app_context: Arc<AppContext> = create_app_context().await;
+
+  let app = app_nils(app_context).await;
+
+  let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();
+  axum::serve(listener, app).await.unwrap();
 }
