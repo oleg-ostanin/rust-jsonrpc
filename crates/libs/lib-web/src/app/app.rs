@@ -10,6 +10,7 @@ use axum::{extract::{Json, State}, Router, routing::{get, post}};
 use axum::http::StatusCode;
 use java_properties::read;
 use tokio_postgres::{Client, NoTls};
+use tower_cookies::CookieManagerLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use lib_core::context::app_context::AppContext;
@@ -27,6 +28,7 @@ pub async fn create_app_context() -> Arc<AppContext> {
 pub async fn app_nils(app_context: Arc<AppContext>) -> Router {
     Router::new()
         .route("/get-books", get(get_books))
+        .layer(CookieManagerLayer::new())
         .with_state(app_context)
 }
 
