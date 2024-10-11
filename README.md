@@ -1,1 +1,1 @@
-# rust-jsonrpc
+Pet project under development.
