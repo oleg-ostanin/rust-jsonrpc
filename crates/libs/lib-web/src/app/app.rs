@@ -15,7 +15,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use lib_core::context::app_context::ModelManager;
 use lib_core::model::user::UserForCreate;
-//use super::super::handlers::signup::sign_up;
+use super::super::handlers::signup::sign_up;
 
 pub async fn create_app_context() -> Arc<ModelManager> {
     let db_url = read_db_url("local.properties");
@@ -48,7 +48,7 @@ async fn get_books(
     Ok("res".to_string())
 }
 
-pub async fn sign_up(
+pub async fn sign_up3(
     State(app_context): State<Arc<ModelManager>>,
     cookies: Cookies,
     Json(payload): Json<UserForCreate>,

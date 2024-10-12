@@ -24,11 +24,15 @@ impl UserBmc {
         mm: &ModelManager,
         user: UserForCreate,
     ) -> Result<u64> {
-        unimplemented!()
-        //Ok(mm.client().execute(INSERT_USER, &user).await?)
+        //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
+        let res = Ok(mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name, &user.last_name, &user.password,
+        &"salt", &"token_salt"])
+            .await?);
+
+        println!("{:?}", res);
+
+        res
     }
-
-
 }
 
 // fn to_params(user: UserForCreate) -> &[&dyn ToSql + Sync] {

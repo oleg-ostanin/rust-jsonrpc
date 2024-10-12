@@ -5,10 +5,10 @@ use crate::model::store;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserForCreate {
-    identity: String,
-    password: String,
-    first_name: String,
-    last_name: String,
+    pub identity: String,
+    pub password: String,
+    pub first_name: String,
+    pub last_name: String,
 }
 
 
