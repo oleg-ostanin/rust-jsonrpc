@@ -5,13 +5,14 @@ use axum::extract;
 use tokio_postgres::Client;
 
 
-pub struct AppContext {
+#[derive(Clone)]
+pub struct ModelManager {
     client: Arc<Client>,
 }
 
-impl AppContext {
-    pub async fn create(client: Arc<Client>) -> AppContext {
-        AppContext {
+impl ModelManager {
+    pub async fn create(client: Arc<Client>) -> ModelManager {
+        ModelManager {
             client
         }
     }

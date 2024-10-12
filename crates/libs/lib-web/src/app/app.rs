@@ -10,22 +10,22 @@ use axum::{extract::{Json, State}, Router, routing::{get, post}};
 use axum::http::StatusCode;
 use java_properties::read;
 use tokio_postgres::{Client, NoTls};
-use tower_cookies::CookieManagerLayer;
+use tower_cookies::{CookieManagerLayer, Cookies};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use lib_core::context::app_context::AppContext;
+use lib_core::context::app_context::ModelManager;
 
 
-pub async fn create_app_context() -> Arc<AppContext> {
+pub async fn create_app_context() -> Arc<ModelManager> {
     let db_url = read_db_url("local.properties");
     let client = get_client(db_url).await;
 
-    let app_context: Arc<AppContext> = Arc::new(AppContext::create(Arc::new(client)).await);
+    let app_context: Arc<ModelManager> = Arc::new(ModelManager::create(Arc::new(client)).await);
 
     app_context
 }
 
-pub async fn app_nils(app_context: Arc<AppContext>) -> Router {
+pub async fn app_nils(app_context: Arc<ModelManager>) -> Router {
     Router::new()
         .route("/get-books", get(get_books))
         .layer(CookieManagerLayer::new())
@@ -34,9 +34,14 @@ pub async fn app_nils(app_context: Arc<AppContext>) -> Router {
 
 
 async fn get_books(
-    State(app_context): State<Arc<AppContext>>,
+    State(app_context): State<Arc<ModelManager>>,
+    cookies: Cookies,
 ) -> Result<String, StatusCode> {
     println!("{:?}", "get books");
+
+    let token = cookies.get("AUTH_TOKEN");
+
+    println!("{:?}", token);
 
     Ok("res".to_string())
 }

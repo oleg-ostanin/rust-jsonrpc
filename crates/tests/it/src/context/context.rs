@@ -16,10 +16,12 @@ use testcontainers::{clients, Container, images::postgres::Postgres};
 use tokio::net::TcpListener;
 use tokio_postgres::NoTls;
 
-use lib_core::context::app_context::AppContext;
+use lib_core::context::app_context::ModelManager;
 use lib_web::app::app::create_app_context;
 use lib_web::app::app::app_nils;
 
+use tower_cookies::{Cookie, Cookies};
+use crate::context::sql::{CREATE_IDENTITY_TYPE, CREATE_USER_TABLE};
 // for `call`, `oneshot`, and `ready`
 
 pub(crate) struct TestContext<> {
@@ -46,7 +48,7 @@ impl TestContext {
         let pg_port = pg_container.get_host_port_ipv4(5432);
 
         // Define the connection to the Postgress client
-        let (client, connection) = tokio_postgres::Config::new()
+        let (pg_client, connection) = tokio_postgres::Config::new()
             .user("postgres")
             .password("postgres")
             .host("localhost")
@@ -63,7 +65,9 @@ impl TestContext {
             }
         });
 
-        let app_context: Arc<AppContext> = Arc::new(AppContext::create(Arc::new(client)).await);
+        init_db(&pg_client).await;
+
+        let app_context: Arc<ModelManager> = Arc::new(ModelManager::create(Arc::new(pg_client)).await);
 
         let app = app_nils(app_context).await;
 
@@ -89,11 +93,15 @@ impl TestContext {
     pub(crate) async fn get_books(&self) -> () {
         let addr = &self.socket_addr;
 
+        let mut cookie = Cookie::new("AUTH_TOKEN", "token".to_string());
+
         let get_response = self.client
             .request(Request::builder()
                 .method(http::Method::GET)
                 .uri(format!("http://{addr}/get-books"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+                .header("cookie", "AUTH_TOKEN=token".to_string())
+
                 .body(Body::empty())
                 .unwrap())
             .await
@@ -101,4 +109,9 @@ impl TestContext {
 
         assert_eq!(get_response.status(), StatusCode::OK);
     }
+}
+
+async fn init_db(pg_client: &tokio_postgres::Client) {
+    pg_client.execute(CREATE_IDENTITY_TYPE, &[]).await.unwrap();
+    pg_client.execute(CREATE_USER_TABLE, &[]).await.unwrap();
 }
