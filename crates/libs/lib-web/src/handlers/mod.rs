@@ -1,1 +1,1 @@
-mod signup;
+pub mod signup;

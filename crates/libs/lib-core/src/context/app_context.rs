@@ -1,11 +1,11 @@
 use std::io::prelude::*;
+use std::ops::Deref;
 use std::sync::Arc;
 
 use axum::extract;
 use tokio_postgres::Client;
 
 
-#[derive(Clone)]
 pub struct ModelManager {
     client: Arc<Client>,
 }
@@ -15,5 +15,9 @@ impl ModelManager {
         ModelManager {
             client
         }
+    }
+
+    pub fn client(&self) -> &Client {
+        self.client.deref()
     }
 }

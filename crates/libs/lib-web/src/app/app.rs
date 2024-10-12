@@ -14,7 +14,8 @@ use tower_cookies::{CookieManagerLayer, Cookies};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use lib_core::context::app_context::ModelManager;
-
+use lib_core::model::user::UserForCreate;
+//use super::super::handlers::signup::sign_up;
 
 pub async fn create_app_context() -> Arc<ModelManager> {
     let db_url = read_db_url("local.properties");
@@ -28,6 +29,7 @@ pub async fn create_app_context() -> Arc<ModelManager> {
 pub async fn app_nils(app_context: Arc<ModelManager>) -> Router {
     Router::new()
         .route("/get-books", get(get_books))
+        .route("/sign-up", post(sign_up))
         .layer(CookieManagerLayer::new())
         .with_state(app_context)
 }
@@ -44,6 +46,16 @@ async fn get_books(
     println!("{:?}", token);
 
     Ok("res".to_string())
+}
+
+pub async fn sign_up(
+    State(app_context): State<Arc<ModelManager>>,
+    cookies: Cookies,
+    Json(payload): Json<UserForCreate>,
+) -> Result<String, StatusCode> {
+    println!("{:?}", payload);
+
+    Ok("ok".to_string())
 }
 
 async fn get_client(db_url: String) -> Client {

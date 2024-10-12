@@ -21,6 +21,7 @@ use lib_web::app::app::create_app_context;
 use lib_web::app::app::app_nils;
 
 use tower_cookies::{Cookie, Cookies};
+use lib_core::model::user::UserForCreate;
 use crate::context::sql::{CREATE_IDENTITY_TYPE, CREATE_USER_TABLE};
 // for `call`, `oneshot`, and `ready`
 
@@ -108,6 +109,27 @@ impl TestContext {
             .unwrap();
 
         assert_eq!(get_response.status(), StatusCode::OK);
+    }
+
+    pub(crate) async fn create_book(&self) {
+        let user_body = UserForCreate::new(
+            "phone".to_string(),
+            "pwd".to_string(),
+            "John".to_string(),
+            "Doe".to_string(),
+        );
+
+        let addr = &self.socket_addr;
+
+        let post_response = self.client
+            .request(Request::builder()
+                .method(http::Method::POST)
+                .uri(format!("http://{addr}/sign-up"))
+                .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+                .body(Body::from(serde_json::to_string(&json!(user_body)).unwrap()))
+                .unwrap())
+            .await
+            .unwrap();
     }
 }
 

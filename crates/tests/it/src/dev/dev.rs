@@ -10,6 +10,7 @@ mod tests {
     async fn nils_second_att() {
         let ctx = TestContext::new().await;
         let books = ctx.get_books().await;
+        ctx.create_book().await;
     }
 
 }
