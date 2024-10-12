@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 use serde::{Deserialize, Serialize};
+use tokio_postgres::{Error, Row};
 use tokio_postgres::types::ToSql;
 use crate::model::store;
 
@@ -41,9 +42,25 @@ impl UserForCreate {
 //     }
 // }
 
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UserStored {
-    id: i64,
-    identity: UserIdentity,
+    pub id: i64,
+    pub identity: String,
+    pub first_name: String,
+    pub last_name: String,
+}
+
+impl TryFrom<&Row> for UserStored {
+    type Error = store::Error;
+
+    fn try_from(row: &tokio_postgres::Row) -> Result<Self, store::Error> {
+        Ok(Self {
+            id: row.try_get("id")?,
+            identity: row.try_get("identity")?,
+            first_name: row.try_get("first_name")?,
+            last_name: row.try_get("last_name")?,
+        })
+    }
 }
 
 #[derive(Debug)]

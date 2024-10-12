@@ -1,8 +1,8 @@
 use tokio_postgres::types::ToSql;
 use crate::context::app_context::ModelManager;
-use crate::model::user::UserForCreate;
+use crate::model::user::{UserForCreate, UserStored};
 
-use super::Result;
+use super::{Error, Result};
 
 pub struct UserBmc;
 //todo return identity type
@@ -34,30 +34,38 @@ impl UserBmc {
         let res = mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
             &user.last_name, &user.password, ]).await;
 
-        match res {
+        // todo propagate error
+        let result = match res {
             Ok(val) => {
                 println!("{:?}", val);
+                Ok(val)
             }
             Err(e) => {
                 println!("{:?}", e);
+                Err(e)
             }
-        }
+        };
 
         Ok(0)
     }
 
     pub async fn get_by_id(
         mm: &ModelManager,
-        user: UserForCreate,
-    ) -> Result<u64> {
+        id: i64,
+    ) -> Result<UserStored> {
         //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
-        let res = Ok(mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name, &user.last_name, &user.password,
-            &"salt", &"token_salt"])
-            .await?);
+        let res = mm.client().query(SELECT_BY_ID, &[&id]).await?;
 
-        println!("{:?}", res);
+        println!("{:?}", &res);
 
-        res
+        if res.is_empty() {
+            return Err(Error::StoreError("not_found".to_string()));
+        }
+
+        let v = res.get(0).unwrap();
+
+        let us = UserStored::try_from(v);
+        us
     }
 }
 
