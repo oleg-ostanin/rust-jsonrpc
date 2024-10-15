@@ -58,14 +58,9 @@ impl UserBmc {
 
         println!("{:?}", &res);
 
-        if res.is_empty() {
-            return Err(Error::StoreError("not_found".to_string()));
-        }
+        let v = res.get(0).ok_or(Error::StoreError("not_found".to_string()))?;
 
-        let v = res.get(0).unwrap();
-
-        let us = UserStored::try_from(v);
-        us
+        UserStored::try_from(v)
     }
 }
 

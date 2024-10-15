@@ -53,7 +53,7 @@ pub struct UserStored {
 impl TryFrom<&Row> for UserStored {
     type Error = store::Error;
 
-    fn try_from(row: &tokio_postgres::Row) -> Result<Self, store::Error> {
+    fn try_from(row: &Row) -> Result<Self, store::Error> {
         Ok(Self {
             id: row.try_get("id")?,
             identity: row.try_get("identity")?,
