@@ -30,6 +30,6 @@ pub async fn sign_up(
 ) -> Result<String, StatusCode> {
     println!("{:?}", payload);
     UserBmc::create(app_context.deref(), payload).await;
-
+    // todo return normal result
     Ok("ok".to_string())
 }

@@ -16,6 +16,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use lib_core::context::app_context::ModelManager;
 use lib_core::model::user::UserForCreate;
 use super::super::handlers::signup::sign_up;
+use super::super::handlers::admin::get_by_id;
 
 pub async fn create_app_context() -> Arc<ModelManager> {
     let db_url = read_db_url("local.properties");
@@ -30,6 +31,7 @@ pub async fn app_nils(app_context: Arc<ModelManager>) -> Router {
     Router::new()
         .route("/get-books", get(get_books))
         .route("/sign-up", post(sign_up))
+        .route("/get-by-id/:user_id", get(get_by_id))
         .layer(CookieManagerLayer::new())
         .with_state(app_context)
 }

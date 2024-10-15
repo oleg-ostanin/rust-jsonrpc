@@ -111,7 +111,27 @@ impl TestContext {
         assert_eq!(get_response.status(), StatusCode::OK);
     }
 
-    pub(crate) async fn create_book(&self) {
+    pub(crate) async fn get_by_id(&self, user_id: i64) -> () {
+        let addr = &self.socket_addr;
+
+        let mut cookie = Cookie::new("AUTH_TOKEN", "token".to_string());
+
+        let get_response = self.client
+            .request(Request::builder()
+                .method(http::Method::GET)
+                .uri(format!("http://{addr}/get-by-id/{user_id}"))
+                .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+                //.header("cookie", "AUTH_TOKEN=token".to_string())
+
+                .body(Body::empty())
+                .unwrap())
+            .await
+            .unwrap();
+
+        assert_eq!(get_response.status(), StatusCode::OK);
+    }
+
+    pub(crate) async fn create_user(&self) {
         let user_body = UserForCreate::new(
             "phone".to_string(),
             "pwd".to_string(),
