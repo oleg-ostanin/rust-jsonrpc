@@ -17,7 +17,7 @@ pub struct Params {
 pub async fn get_by_id(
     State(app_context): State<Arc<ModelManager>>,
     cookies: Cookies,
-    Path(Params { user_id }): Path<Params>,
+    Path(user_id): Path<i64>,
 ) -> Result<String, StatusCode> {
     println!("{:?}", user_id);
     let res = UserBmc::get_by_id(app_context.deref(), user_id).await;

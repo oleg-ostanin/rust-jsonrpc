@@ -29,7 +29,9 @@ pub async fn sign_up(
     Json(payload): Json<UserForCreate>,
 ) -> Result<String, StatusCode> {
     println!("{:?}", payload);
-    UserBmc::create(app_context.deref(), payload).await;
-    // todo return normal result
-    Ok("ok".to_string())
+    match UserBmc::create(app_context.deref(), payload).await {
+        Ok(id) => Ok(id.to_string()),
+        Err(e) => Err(StatusCode::BAD_REQUEST)
+    }
+
 }
