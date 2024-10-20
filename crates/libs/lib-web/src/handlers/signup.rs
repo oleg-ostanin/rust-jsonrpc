@@ -10,19 +10,6 @@ use lib_core::model::user::UserForCreate;
 
 use lib_core::model::store::user::UserBmc;
 
-pub async fn sign_up1(
-    State(app_context): State<Arc<ModelManager>>,
-    Json(payload): Json<UserForCreate>,
-) -> Result<u64, StatusCode> {
-    println!("{:?}", payload);
-
-    UserBmc::create(app_context.deref(), payload).await.or(Err(StatusCode::INTERNAL_SERVER_ERROR))
-    // match res {
-    //     Ok(id) => Ok(id),
-    //     Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
-    // }
-}
-
 pub async fn sign_up(
     State(app_context): State<Arc<ModelManager>>,
     cookies: Cookies,
@@ -33,5 +20,4 @@ pub async fn sign_up(
         Ok(id) => Ok(id.to_string()),
         Err(e) => Err(StatusCode::BAD_REQUEST)
     }
-
 }
