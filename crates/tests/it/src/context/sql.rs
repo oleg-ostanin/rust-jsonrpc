@@ -13,9 +13,9 @@ CREATE TABLE "users" (
   last_name varchar(128),
 
   -- Auth
-  pwd varchar(256)
-  -- pwd_salt uuid NOT NULL DEFAULT gen_random_uuid(),
-  -- token_salt uuid NOT NULL DEFAULT gen_random_uuid(),
+  pwd varchar(256),
+  pwd_salt varchar(128) NOT NULL ,
+  token_salt varchar(128) NOT NULL
 
   -- Timestamps
   -- created_at timestamp with time zone NOT NULL,

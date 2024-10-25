@@ -1,4 +1,5 @@
 pub mod app;
 pub mod error;
-mod middleware;
-mod handlers;
+pub mod middleware;
+pub mod handlers;
+pub mod utils;

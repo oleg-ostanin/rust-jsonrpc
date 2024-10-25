@@ -6,7 +6,7 @@ use std::io::BufReader;
 use std::ops::Deref;
 use std::sync::Arc;
 
-use axum::{extract::{Json, State}, Router, routing::{get, post}};
+use axum::{extract::{Json, State}, middleware, Router, routing::{get, post}};
 use axum::http::StatusCode;
 use java_properties::read;
 use tokio_postgres::{Client, NoTls};
@@ -15,6 +15,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use lib_core::context::app_context::ModelManager;
 use lib_core::model::user::UserForCreate;
+use crate::middleware::mw_auth::mw_ctx_resolver;
 use super::super::handlers::signup::sign_up;
 use super::super::handlers::admin::get_by_id;
 
@@ -32,6 +33,7 @@ pub async fn app_nils(app_context: Arc<ModelManager>) -> Router {
         .route("/get-books", get(get_books))
         .route("/sign-up", post(sign_up))
         .route("/get-by-id/:user_id", get(get_by_id))
+        //.layer(middleware::from_fn_with_state(app_context.clone(), mw_ctx_resolver))
         .layer(CookieManagerLayer::new())
         .with_state(app_context)
 }

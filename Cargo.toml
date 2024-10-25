@@ -6,6 +6,8 @@ resolver = "2"
 members = [
     "crates/libs/lib-auth",
     "crates/libs/lib-core",
+    "crates/libs/lib-rpc-core",
+    "crates/libs/lib-utils",
     "crates/libs/lib-web",
     # -- Application Services
     "crates/services/web-server",
