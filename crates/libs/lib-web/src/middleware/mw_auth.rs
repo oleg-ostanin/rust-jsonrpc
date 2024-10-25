@@ -1,3 +1,5 @@
+use std::ops::Deref;
+use std::sync::Arc;
 use crate::error::{Error, Result};
 use crate::utils::token::{set_token_cookie, AUTH_TOKEN};
 use axum::async_trait;
@@ -34,7 +36,7 @@ pub async fn mw_ctx_require(
 //            for the appropriate middleware (.e.g., mw_ctx_require which forces successful auth) or handler
 //            to get the appropriate information.
 pub async fn mw_ctx_resolver(
-	State(mm): State<ModelManager>,
+	State(mm): State<Arc<ModelManager>>,
 	cookies: Cookies,
 	mut req: Request<Body>,
 	next: Next,
@@ -56,7 +58,7 @@ pub async fn mw_ctx_resolver(
 	next.run(req).await
 }
 
-async fn ctx_resolve(mm: ModelManager, cookies: &Cookies) -> CtxExtResult {
+async fn ctx_resolve(mm: Arc<ModelManager>, cookies: &Cookies) -> CtxExtResult {
 	// -- Get Token String
 	let token = cookies
 		.get(AUTH_TOKEN)
@@ -69,7 +71,7 @@ async fn ctx_resolve(mm: ModelManager, cookies: &Cookies) -> CtxExtResult {
 	// -- Get UserForAuth
 	let user: UserForAuth =
 		//UserBmc::get_for_auth(&Ctx::root_ctx(), &mm, &token.ident)
-		UserBmc::get_for_auth(&mm, &token.ident)
+		UserBmc::get_for_auth(&mm.deref(), &token.ident)
 			.await
 			.map_err(|ex| CtxExtError::ModelAccessError(ex.to_string()))?;
 			//.ok_or(CtxExtError::UserNotFound)?;

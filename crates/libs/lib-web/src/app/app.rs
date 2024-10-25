@@ -33,7 +33,7 @@ pub async fn app_nils(app_context: Arc<ModelManager>) -> Router {
         .route("/get-books", get(get_books))
         .route("/sign-up", post(sign_up))
         .route("/get-by-id/:user_id", get(get_by_id))
-        //.layer(middleware::from_fn_with_state(app_context.clone(), mw_ctx_resolver))
+        .layer(middleware::from_fn_with_state(app_context.clone(), mw_ctx_resolver))
         .layer(CookieManagerLayer::new())
         .with_state(app_context)
 }
