@@ -59,6 +59,10 @@ pub async fn mw_ctx_resolver(
 }
 
 async fn ctx_resolve(mm: Arc<ModelManager>, cookies: &Cookies) -> CtxExtResult {
+	let token = cookies.get("auth-token");
+
+	println!("{:?}", token);
+
 	// -- Get Token String
 	let token = cookies
 		.get(AUTH_TOKEN)

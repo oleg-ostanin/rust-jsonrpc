@@ -93,6 +93,8 @@ fn _generate_token(
 	// -- Sign the two first components.
 	let sign_b64u = _token_sign_into_b64u(&ident, &exp, salt, key)?;
 
+	println!("{ident}.{exp}.{sign_b64u}");
+
 	Ok(Token {
 		ident,
 		exp,
@@ -207,6 +209,26 @@ mod tests {
 		let fx_salt =
 			Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453").unwrap();
 		let fx_duration_sec = 0.02; // 20ms
+		let token_key = &auth_config().TOKEN_KEY;
+		let fx_token =
+			_generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
+
+		// -- Exec
+		thread::sleep(Duration::from_millis(10));
+		let res = validate_web_token(&fx_token, fx_salt);
+
+		// -- Check
+		res?;
+
+		Ok(())
+	}
+	#[test]
+	fn temp_create_token() -> Result<()> {
+		// -- Setup & Fixtures
+		let fx_user = "2128506";
+		let fx_salt =
+			Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453").unwrap();
+		let fx_duration_sec = 3600.00 * 24.0 * 365.0 * 10.0 ; // about ten years
 		let token_key = &auth_config().TOKEN_KEY;
 		let fx_token =
 			_generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;

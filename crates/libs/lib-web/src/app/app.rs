@@ -45,9 +45,11 @@ async fn get_books(
 ) -> Result<String, StatusCode> {
     println!("{:?}", "get books");
 
-    let token = cookies.get("AUTH_TOKEN");
+    let token = cookies.get("auth-token");
+    println!("books 1 {:?}", token);
 
-    println!("{:?}", token);
+    let new_token = cookies.get("new-auth-token");
+    println!("books 2 {:?}", new_token);
 
     Ok("res".to_string())
 }

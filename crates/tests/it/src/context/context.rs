@@ -101,7 +101,8 @@ impl TestContext {
                 .method(http::Method::GET)
                 .uri(format!("http://{addr}/get-books"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                .header("cookie", "AUTH_TOKEN=token".to_string())
+                .header("cookie", "auth-token=token".to_string())
+                .header("cookie", "new-auth-token=new-token".to_string())
 
                 .body(Body::empty())
                 .unwrap())
@@ -121,7 +122,7 @@ impl TestContext {
                 .method(http::Method::GET)
                 .uri(format!("http://{addr}/get-by-id/{user_id}"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                //.header("cookie", "AUTH_TOKEN=token".to_string())
+                .header("cookie", "auth-token=token".to_string())
 
                 .body(Body::empty())
                 .unwrap())
@@ -133,7 +134,7 @@ impl TestContext {
 
     pub(crate) async fn create_user(&self) {
         let user_body = UserForCreate::new(
-            "phone".to_string(),
+            "2128506".to_string(),
             "pwd".to_string(),
             "John".to_string(),
             "Doe".to_string(),

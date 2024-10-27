@@ -1,3 +1,4 @@
+use serde_json::to_string;
 use tokio_postgres::types::ToSql;
 use uuid::Uuid;
 use crate::context::app_context::ModelManager;
@@ -35,8 +36,10 @@ impl UserBmc {
         mm: &ModelManager,
         user: UserForCreate,
     ) -> Result<u64> {
-        let pwd_salt = Uuid::new_v4().to_string();
-        let token_salt = Uuid::new_v4().to_string();
+        //let pwd_salt = Uuid::new_v4().to_string();
+        let pwd_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
+        //let token_salt = Uuid::new_v4().to_string();
+        let token_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
 
         //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
         let res = mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
