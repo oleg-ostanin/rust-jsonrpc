@@ -2,7 +2,7 @@ use serde_json::to_string;
 use tokio_postgres::types::ToSql;
 use uuid::Uuid;
 use crate::context::app_context::ModelManager;
-use crate::model::user::{UserForAuth, UserForCreate, UserStored};
+use crate::model::user::{UserForAuth, UserForCreate, UserForLogin, UserStored};
 
 use super::{Error, Result};
 
@@ -86,6 +86,20 @@ impl UserBmc {
         let v = res.get(0).ok_or(Error::StoreError("not_found".to_string()))?;
 
         UserForAuth::try_from(v)
+    }
+
+    pub async fn get_for_login(
+        mm: &ModelManager,
+        identity: &String,
+    ) -> Result<UserForLogin> {
+        //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
+        let res = mm.client().query(SELECT_BY_IDENTITY, &[identity]).await?;
+
+        println!("{:?}", &res);
+
+        let v = res.get(0).ok_or(Error::StoreError("not_found".to_string()))?;
+
+        UserForLogin::try_from(v)
     }
 }
 

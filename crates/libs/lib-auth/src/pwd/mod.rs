@@ -81,6 +81,14 @@ pub async fn validate_pwd(
 	// validate_for_scheme(&scheme_name, to_hash, &hashed).await?;
 	Ok(scheme_status)
 }
+
+pub async fn validate_pwd_temp(
+	to_hash: ContentToHash,
+	pwd_ref: String,
+) -> Result<SchemeStatus> {
+
+	Ok(SchemeStatus::Ok)
+}
 // endregion: --- Public Functions
 
 // region:    --- Privates

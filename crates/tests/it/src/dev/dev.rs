@@ -11,6 +11,7 @@ mod tests {
         let ctx = TestContext::new().await;
         let books = ctx.get_books().await;
         ctx.create_user().await;
+        ctx.sign_in_user().await;
         ctx.get_by_id(1).await;
     }
 

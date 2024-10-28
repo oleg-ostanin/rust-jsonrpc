@@ -33,11 +33,42 @@ impl UserForCreate {
     }
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UserForSignIn {
+    pub identity: String,
+    pub password: String,
+}
+
+impl UserForSignIn {
+    pub fn new(
+        identity: String,
+        password: String,
+
+    ) -> Self {
+        UserForSignIn {
+            identity,
+            password,
+        }
+    }
+}
+
 #[derive(Clone, FromRow, Fields, Debug)]
 pub struct UserForAuth {
     pub id: i64,
     pub identity: String,
 
+    // -- token info
+    pub token_salt: Uuid,
+}
+
+#[derive(Clone, FromRow, Fields, Debug)]
+pub struct UserForLogin {
+    pub id: i64,
+    pub identity: String,
+    pub pwd: Option<String>,
+
+    // -- pwd info
+    pub pwd_salt: Uuid,
     // -- token info
     pub token_salt: Uuid,
 }
@@ -83,6 +114,20 @@ impl TryFrom<&Row> for UserForAuth {
         Ok(Self {
             id: row.try_get("id")?,
             identity: row.try_get("identity")?,
+            token_salt: Uuid::parse_str(row.try_get("token_salt")?).unwrap(),
+        })
+    }
+}
+
+impl TryFrom<&Row> for UserForLogin {
+    type Error = store::Error;
+
+    fn try_from(row: &Row) -> Result<Self, store::Error> {
+        Ok(Self {
+            id: row.try_get("id")?,
+            identity: row.try_get("identity")?,
+            pwd: row.try_get("identity")?,
+            pwd_salt: Uuid::parse_str(row.try_get("pwd_salt")?).unwrap(),
             token_salt: Uuid::parse_str(row.try_get("token_salt")?).unwrap(),
         })
     }

@@ -18,6 +18,6 @@ pub async fn sign_up(
     println!("{:?}", payload);
     match UserBmc::create(app_context.deref(), payload).await {
         Ok(id) => Ok(id.to_string()),
-        Err(e) => Err(StatusCode::BAD_REQUEST)
+        Err(e) => Err(StatusCode::BAD_REQUEST) // todo more clear status code
     }
 }

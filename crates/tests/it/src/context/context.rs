@@ -21,7 +21,7 @@ use lib_web::app::app::app_nils;
 
 use tower_cookies::{Cookie, Cookies};
 use uuid::Uuid;
-use lib_core::model::user::UserForCreate;
+use lib_core::model::user::{UserForCreate, UserForLogin, UserForSignIn};
 use crate::context::sql::{CREATE_IDENTITY_TYPE, CREATE_USER_TABLE};
 // for `call`, `oneshot`, and `ready`
 
@@ -151,6 +151,29 @@ impl TestContext {
                 .unwrap())
             .await
             .unwrap();
+    }
+
+    pub(crate) async fn sign_in_user(&self) {
+        let user_body = UserForSignIn::new(
+            "2128506".to_string(),
+            "pwd".to_string(),
+        );
+
+        let addr = &self.socket_addr;
+
+        let post_response = self.client
+            .request(Request::builder()
+                .method(http::Method::POST)
+                .uri(format!("http://{addr}/sign-in"))
+                .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+                .body(Body::from(serde_json::to_string(&json!(user_body)).unwrap()))
+                .unwrap())
+            .await
+            .unwrap();
+
+
+        println!("post response: {:?}", &post_response);
+        println!("headers: {:?}", &post_response.headers())
     }
 }
 
