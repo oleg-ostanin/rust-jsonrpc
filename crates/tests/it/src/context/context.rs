@@ -173,7 +173,10 @@ impl TestContext {
 
 
         println!("post response: {:?}", &post_response);
-        println!("headers: {:?}", &post_response.headers())
+        println!("headers: {:?}", &post_response.headers());
+
+        let sc = post_response.headers().get("set-cookie");
+        println!("-----------------------sc: {:?}", sc)
     }
 }
 
