@@ -122,7 +122,7 @@ impl TestContext {
                 .method(http::Method::GET)
                 .uri(format!("http://{addr}/get-by-id/{user_id}"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                .header("cookie", "auth-token=token".to_string())
+                .header("cookie", "auth-token=MjEyODUwNg.MjAzNC0xMC0yNVQxMDowNDowMi4yMDUyMTkxNjVa.VxoYpuLk3VncAxHv-UOu5hidzUNOW1KmK--PPZv6L5Asz1U_R-F71YgleZMxb6t-9lneOqtn9i4ODgtWWjNERg".to_string())
 
                 .body(Body::empty())
                 .unwrap())

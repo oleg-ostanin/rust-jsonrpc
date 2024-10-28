@@ -17,6 +17,8 @@ use uuid::Uuid;
 
 // region:    --- Token Type
 
+const TOKEN_KEY: &str = "9FoHBmkyxbgu_xFoQK7e0jz3RMNVJWgfvbVn712FBNH9LLaAWS3CS6Zpcg6RveiObvCUb6a2z-uAiLjhLh2igw";
+
 /// String format: `ident_b64u.exp_b64u.sign_b64u`
 #[derive(Debug)]
 #[cfg_attr(test, derive(PartialEq))]
@@ -92,8 +94,8 @@ fn _generate_token(
 
 	// -- Sign the two first components.
 	let sign_b64u = _token_sign_into_b64u(&ident, &exp, salt, key)?;
-
-	println!("{ident}.{exp}.{sign_b64u}");
+	let content = format!("{}.{}", b64u_encode(&ident), b64u_encode(&exp));
+	println!("{content}.{sign_b64u}");
 
 	Ok(Token {
 		ident,
