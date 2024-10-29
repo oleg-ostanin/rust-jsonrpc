@@ -92,7 +92,7 @@ pub struct UserStored {
     pub identity: String,
     pub first_name: String,
     pub last_name: String,
-    pub pwd: String,
+    pub pwd: String, // todo remove
 }
 
 impl TryFrom<&Row> for UserStored {

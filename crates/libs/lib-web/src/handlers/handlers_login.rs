@@ -31,9 +31,9 @@ pub async fn api_login_handler(
 
 	// -- Get the user.
 	//let user: UserForLogin = UserBmc::get_for_login(&root_ctx, &mm, &username)
-	let user: UserForLogin = UserBmc::get_for_login(&mm.deref(), &identity).await.unwrap(); // todo ununwrap
-		//.await?
-		//.ok_or(Error::LoginFailUsernameNotFound)?;
+	let user: UserForLogin = UserBmc::get_for_login(&mm.deref(), &identity)
+		.await
+		.or(Err(Error::LoginFailUsernameNotFound))?;
 	let user_id = user.id;
 
 	// -- Validate the password.

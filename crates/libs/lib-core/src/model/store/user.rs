@@ -103,6 +103,7 @@ impl UserBmc {
         UserForAuth::try_from(v)
     }
 
+    // todo make these two functions generic
     pub async fn get_for_login(
         mm: &ModelManager,
         identity: &String,
