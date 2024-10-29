@@ -1,6 +1,12 @@
 use serde_json::to_string;
 use tokio_postgres::types::ToSql;
 use uuid::Uuid;
+use lib_auth::pwd;
+use lib_auth::pwd::{ContentToHash, hash_pwd};
+use lib_utils::b64::b64u_encode;
+
+use lib_auth::pwd::scheme::hash::hash;
+
 use crate::context::app_context::ModelManager;
 use crate::model::user::{UserForAuth, UserForCreate, UserForLogin, UserStored};
 
@@ -38,12 +44,21 @@ impl UserBmc {
     ) -> Result<u64> {
         //let pwd_salt = Uuid::new_v4().to_string();
         let pwd_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
+        let fx_to_hash = ContentToHash {
+            content: user.password.clone(),
+            salt: Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453").unwrap(),
+        };
+
+        let pwd_hashed = hash_pwd(fx_to_hash).await.unwrap();
+
+        //pwd: "IzAyIyRhcmdvbjJpZCR2PTE5JG09MTk0NTYsdD0yLHA9MSQ4RjZKWWRhdFFJYWVlS2JlQmw1VVV3JHpYUkxkRm1wS3BwUTRvTXRXcktsdkFEcVdGNUJKSnZXcCtyS2FKZ1V2czg"
+        //let encoded = b64u_encode(pwd_hashed);
         //let token_salt = Uuid::new_v4().to_string();
         let token_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
 
         //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
         let res = mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
-            &user.last_name, &user.password, &pwd_salt, &token_salt]).await;
+            &user.last_name, &pwd_hashed, &pwd_salt, &token_salt]).await;
 
         // todo propagate error
         let result = match res {

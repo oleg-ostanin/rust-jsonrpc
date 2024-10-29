@@ -17,7 +17,7 @@
 // region:    --- Modules;
 
 mod error;
-mod scheme;
+pub mod scheme;
 
 pub use self::error::{Error, Result};
 pub use scheme::SchemeStatus;

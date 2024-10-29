@@ -1,6 +1,7 @@
 // region:    --- Modules
 
 mod error;
+pub mod hash;
 mod scheme_01;
 mod scheme_02;
 

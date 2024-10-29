@@ -42,10 +42,10 @@ pub async fn api_login_handler(
 	};
 
 	// todo revert to validate_pwd
-	let scheme_status = pwd::validate_pwd_temp(
+	let scheme_status = pwd::validate_pwd(
 		ContentToHash {
-			salt: user.pwd_salt,
 			content: password.clone(),
+			salt: user.pwd_salt,
 		},
 		pwd,
 	)
@@ -105,3 +105,14 @@ pub struct LogoffPayload {
 	logoff: bool,
 }
 // endregion: --- Logoff
+
+
+// // todo revert to validate_pwd
+// let scheme_status = pwd::scheme::hash::validate(
+// &ContentToHash {
+// content: password.clone(),
+// salt: user.pwd_salt,
+// },
+// &pwd,
+// )
+// .map_err(|_| Error::LoginFailPwdNotMatching { user_id })?;

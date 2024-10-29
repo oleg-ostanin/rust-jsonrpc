@@ -92,6 +92,7 @@ pub struct UserStored {
     pub identity: String,
     pub first_name: String,
     pub last_name: String,
+    pub pwd: String,
 }
 
 impl TryFrom<&Row> for UserStored {
@@ -103,6 +104,7 @@ impl TryFrom<&Row> for UserStored {
             identity: row.try_get("identity")?,
             first_name: row.try_get("first_name")?,
             last_name: row.try_get("last_name")?,
+            pwd: row.try_get("pwd")?,
         })
     }
 }
@@ -126,7 +128,7 @@ impl TryFrom<&Row> for UserForLogin {
         Ok(Self {
             id: row.try_get("id")?,
             identity: row.try_get("identity")?,
-            pwd: row.try_get("identity")?,
+            pwd: row.try_get("pwd")?,
             pwd_salt: Uuid::parse_str(row.try_get("pwd_salt")?).unwrap(),
             token_salt: Uuid::parse_str(row.try_get("token_salt")?).unwrap(),
         })

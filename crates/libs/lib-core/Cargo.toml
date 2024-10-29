@@ -15,6 +15,7 @@ with-rpc = ["rpc-router"]
 [dependencies]
 
 lib-auth = { path = "../../libs/lib-auth"}
+lib-utils = { path = "../../libs/lib-utils"}
 
 # nils dependencies
 axum = { version = "0.7", features = ["tokio", "http1"] }
