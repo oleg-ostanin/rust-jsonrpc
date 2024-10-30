@@ -10,6 +10,7 @@ pub(in crate::model) mod dbx;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
+use lib_auth::pwd;
 // endregion: --- Modules
 
 pub type Db = Pool<Postgres>;
@@ -41,6 +42,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
     StoreError(String),
     NotFound,
+    FailedToHash,
 }
 
 // region:    --- Error Boilerplate
@@ -67,5 +69,11 @@ impl From<tokio_postgres::Error> for Error {
 impl From<uuid::Error> for Error {
     fn from(value: uuid::Error) -> Self {
         Error::StoreError(value.to_string())
+    }
+}
+
+impl From<pwd::Error> for Error {
+    fn from(_: pwd::Error) -> Self {
+        Error::FailedToHash
     }
 }

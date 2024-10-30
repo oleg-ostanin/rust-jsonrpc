@@ -112,7 +112,7 @@ impl TestContext {
         assert_eq!(get_response.status(), StatusCode::OK);
     }
 
-    pub(crate) async fn get_by_id(&self, user_id: i64) -> () {
+    pub(crate) async fn get_user_by_id(&self, user_id: i64, auth_token: impl Into<String>) -> () {
         let addr = &self.socket_addr;
 
         let mut cookie = Cookie::new("AUTH_TOKEN", "token".to_string());
@@ -122,8 +122,7 @@ impl TestContext {
                 .method(http::Method::GET)
                 .uri(format!("http://{addr}/get-by-id/{user_id}"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                .header("cookie", "auth-token=MjEyODUwNg.MjAzNC0xMC0yNVQxMDowNDowMi4yMDUyMTkxNjVa.VxoYpuLk3VncAxHv-UOu5hidzUNOW1KmK--PPZv6L5Asz1U_R-F71YgleZMxb6t-9lneOqtn9i4ODgtWWjNERg".to_string())
-
+                .header("cookie", auth_token.into())
                 .body(Body::empty())
                 .unwrap())
             .await
@@ -132,14 +131,7 @@ impl TestContext {
         assert_eq!(get_response.status(), StatusCode::OK);
     }
 
-    pub(crate) async fn create_user(&self) {
-        let user_body = UserForCreate::new(
-            "2128506".to_string(),
-            "pwd".to_string(),
-            "John".to_string(),
-            "Doe".to_string(),
-        );
-
+    pub(crate) async fn create_user(&self, user_body: UserForCreate) {
         let addr = &self.socket_addr;
 
         let post_response = self.client
@@ -153,12 +145,7 @@ impl TestContext {
             .unwrap();
     }
 
-    pub(crate) async fn sign_in_user(&self) {
-        let user_body = UserForSignIn::new(
-            "2128506".to_string(),
-            "pwd".to_string(),
-        );
-
+    pub(crate) async fn sign_in_user(&self, user_body: UserForSignIn) -> Option<String> {
         let addr = &self.socket_addr;
 
         let post_response = self.client
@@ -176,7 +163,15 @@ impl TestContext {
         println!("headers: {:?}", &post_response.headers());
 
         let sc = post_response.headers().get("set-cookie");
-        println!("-----------------------sc: {:?}", sc)
+        println!("-----------------------sc: {:?}", sc);
+
+        if let Some(hv) = sc {
+            let hv_str = hv.to_str().unwrap();
+            println!("-----------------------hv_str: {:?}", hv_str);
+            Some(hv_str.to_string())
+        } else {
+            None
+        }
     }
 }
 

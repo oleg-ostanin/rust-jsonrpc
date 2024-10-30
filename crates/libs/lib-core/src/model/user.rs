@@ -1,5 +1,6 @@
 use std::str::FromStr;
 use std::time::SystemTime;
+use derive_builder::Builder;
 use modql::field::Fields;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -8,7 +9,7 @@ use tokio_postgres::types::ToSql;
 use uuid::Uuid;
 use crate::model::store;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Builder)]
 pub struct UserForCreate {
     pub identity: String,
     pub password: String,
@@ -19,16 +20,16 @@ pub struct UserForCreate {
 
 impl UserForCreate {
     pub fn new(
-        identity: String,
-        password: String,
-        first_name: String,
-        last_name: String,
+        identity: impl Into<String>,
+        password: impl Into<String>,
+        first_name: impl Into<String>,
+        last_name: impl Into<String>,
     ) -> Self {
         UserForCreate {
-            identity,
-            password,
-            first_name,
-            last_name,
+            identity: identity.into(),
+            password: password.into(),
+            first_name: first_name.into(),
+            last_name: last_name.into(),
         }
     }
 }
@@ -41,13 +42,13 @@ pub struct UserForSignIn {
 
 impl UserForSignIn {
     pub fn new(
-        identity: String,
-        password: String,
+        identity: impl Into<String>,
+        password: impl Into<String>,
 
     ) -> Self {
         UserForSignIn {
-            identity,
-            password,
+            identity: identity.into(),
+            password: password.into(),
         }
     }
 }

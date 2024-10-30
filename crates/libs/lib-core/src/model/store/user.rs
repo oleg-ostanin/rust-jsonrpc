@@ -1,3 +1,4 @@
+use http_body_util::BodyExt;
 use serde_json::to_string;
 use tokio_postgres::types::ToSql;
 use uuid::Uuid;
@@ -42,14 +43,14 @@ impl UserBmc {
         mm: &ModelManager,
         user: UserForCreate,
     ) -> Result<u64> {
-        //let pwd_salt = Uuid::new_v4().to_string();
-        let pwd_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
-        let fx_to_hash = ContentToHash {
+        let pwd_salt = Uuid::new_v4();
+        let to_hash = ContentToHash {
             content: user.password.clone(),
-            salt: Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453").unwrap(),
+            salt: pwd_salt,
         };
 
-        let pwd_hashed = hash_pwd(fx_to_hash).await.unwrap();
+        let pwd_hashed = hash_pwd(to_hash).await?;
+            //.map_err(|_| Error::FailedToHash)?;
 
         //pwd: "IzAyIyRhcmdvbjJpZCR2PTE5JG09MTk0NTYsdD0yLHA9MSQ4RjZKWWRhdFFJYWVlS2JlQmw1VVV3JHpYUkxkRm1wS3BwUTRvTXRXcktsdkFEcVdGNUJKSnZXcCtyS2FKZ1V2czg"
         //let encoded = b64u_encode(pwd_hashed);
@@ -57,22 +58,23 @@ impl UserBmc {
         let token_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
 
         //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
-        let res = mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
-            &user.last_name, &pwd_hashed, &pwd_salt, &token_salt]).await;
+        // todo try to store uuid instead of string
+        Ok(mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
+            &user.last_name, &pwd_hashed, &pwd_salt.to_string(), &token_salt]).await?)
 
         // todo propagate error
-        let result = match res {
-            Ok(val) => {
-                println!("{:?}", val);
-                Ok(val)
-            }
-            Err(e) => {
-                println!("{:?}", e);
-                Err(e)
-            }
-        };
-
-        Ok(0)
+        // let result = match res {
+        //     Ok(val) => {
+        //         println!("{:?}", val);
+        //         Ok(val)
+        //     }
+        //     Err(e) => {
+        //         println!("{:?}", e);
+        //         Err(e)
+        //     }
+        // };
+        //
+        // Ok(0)
     }
 
     pub async fn get_by_id(
