@@ -7,7 +7,7 @@ use serde::Deserialize;
 use tower_cookies::Cookies;
 use lib_core::context::app_context::ModelManager;
 use lib_core::model::store::user::UserBmc;
-use lib_core::model::user::UserForCreate;
+use lib_core::model::user::{UserForCreate, UserStored};
 
 #[derive(Deserialize)]
 pub struct Params {
@@ -18,9 +18,9 @@ pub async fn get_by_id(
     State(app_context): State<Arc<ModelManager>>,
     cookies: Cookies,
     Path(user_id): Path<i64>,
-) -> Result<String, StatusCode> {
+) -> Result<Json<UserStored>, StatusCode> {
     println!("{:?}", user_id);
     let res = UserBmc::get_by_id(app_context.deref(), user_id).await;
     println!("{:?}", res);
-    Ok("ok".to_string())
+    Ok(Json::from(res.unwrap()))
 }

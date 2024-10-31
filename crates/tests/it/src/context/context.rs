@@ -21,7 +21,7 @@ use lib_web::app::app::app_nils;
 
 use tower_cookies::{Cookie, Cookies};
 use uuid::Uuid;
-use lib_core::model::user::{UserForCreate, UserForLogin, UserForSignIn};
+use lib_core::model::user::{UserForCreate, UserForLogin, UserForSignIn, UserStored};
 use crate::context::sql::{CREATE_IDENTITY_TYPE, CREATE_USER_TABLE};
 // for `call`, `oneshot`, and `ready`
 
@@ -112,10 +112,8 @@ impl TestContext {
         assert_eq!(get_response.status(), StatusCode::OK);
     }
 
-    pub(crate) async fn get_user_by_id(&self, user_id: i64, auth_token: impl Into<String>) -> () {
+    pub(crate) async fn get_user_by_id(&self, user_id: i64, auth_token: impl Into<String>) -> Option<UserStored> {
         let addr = &self.socket_addr;
-
-        let mut cookie = Cookie::new("AUTH_TOKEN", "token".to_string());
 
         let get_response = self.client
             .request(Request::builder()
@@ -129,6 +127,14 @@ impl TestContext {
             .unwrap();
 
         assert_eq!(get_response.status(), StatusCode::OK);
+
+        // asynchronously aggregate the chunks of the body
+        let body = get_response.collect().await.unwrap().aggregate();
+
+        // try to parse as json with serde_json
+        let user: UserStored = serde_json::from_reader(body.reader()).unwrap();
+
+        Some(user)
     }
 
     pub(crate) async fn create_user(&self, user_body: UserForCreate) {

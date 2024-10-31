@@ -16,7 +16,7 @@ mod tests {
 
         let auth_token = ctx.sign_in_user(user_body).await;
         assert!(auth_token.is_some());
-        ctx.get_user_by_id(1, auth_token.unwrap()).await;
+        ctx.get_user_by_id(2, auth_token.unwrap()).await;
     }
 
 }
