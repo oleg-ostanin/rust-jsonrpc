@@ -209,16 +209,18 @@ impl TestContext {
 
     fn get_builder(&self, path: impl Into<String>) -> Request<Body> {
         let addr = &self.socket_addr;
-        let auth_token = &self.auth_token.clone().unwrap_or("".to_string());
         let path: String = path.into();
 
-        Request::builder()
+        let mut builder = Request::builder()
             .method(http::Method::GET)
             .uri(format!("http://{addr}{path}"))
-            .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-            .header("cookie", auth_token)
-            .body(Body::empty())
-            .unwrap()
+            .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref());
+
+        if let Some(auth_token) = self.auth_token.clone() {
+            builder = builder.header("cookie", auth_token)
+        }
+
+        builder.body(Body::empty()).unwrap()
     }
 }
 
