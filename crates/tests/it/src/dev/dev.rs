@@ -9,14 +9,14 @@ mod tests {
 
     #[tokio::test]
     async fn nils_second_att() {
-        let ctx = TestContext::new().await;
+        let mut ctx = TestContext::new().await;
         let user_body = UserForCreate::new("2128506", "pwd", "John", "Doe");
         ctx.create_user(user_body).await;
         let user_body = UserForSignIn::new("2128506", "pwd");
 
         let auth_token = ctx.sign_in_user(user_body).await;
         assert!(auth_token.is_some());
-        ctx.get_user_by_id(2, auth_token.unwrap()).await;
+        ctx.get_user_by_id(1, auth_token.unwrap()).await;
     }
 
 }

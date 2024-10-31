@@ -1,10 +1,7 @@
 use core::net::SocketAddr;
 use std::sync::Arc;
 
-use axum::{
-    body::Body,
-    http::{self, Request, StatusCode},
-};
+use axum::{body::Body, Error, http::{self, Request, StatusCode}};
 use http_body_util::BodyExt;
 use hyper::body::Buf;
 use hyper_util::client::legacy::Client;
@@ -14,7 +11,7 @@ use serde_json::json;
 use testcontainers::{clients, Container, images::postgres::Postgres};
 use tokio::net::TcpListener;
 use tokio_postgres::NoTls;
-
+use tower::builder;
 use lib_core::context::app_context::ModelManager;
 use lib_web::app::app::create_app_context;
 use lib_web::app::app::app_nils;
@@ -25,11 +22,19 @@ use lib_core::model::user::{UserForCreate, UserForLogin, UserForSignIn, UserStor
 use crate::context::sql::{CREATE_IDENTITY_TYPE, CREATE_USER_TABLE};
 // for `call`, `oneshot`, and `ready`
 
+#[derive(Debug, Clone)]
+struct HeaderWrapper {
+    key: String,
+    value: String,
+}
+
 pub(crate) struct TestContext<> {
     docker: &'static clients::Cli,
     pg_container: &'static(Container<'static, Postgres>),
     client: Client<HttpConnector, Body>,
     socket_addr: SocketAddr,
+    auth_token: Option<String>,
+    headers: Vec<HeaderWrapper>,
 }
 
 impl TestContext {
@@ -88,6 +93,8 @@ impl TestContext {
             pg_container,
             client,
             socket_addr,
+            auth_token: None,
+            headers: Vec::new(),
         }
     }
 
@@ -112,7 +119,7 @@ impl TestContext {
         assert_eq!(get_response.status(), StatusCode::OK);
     }
 
-    pub(crate) async fn get_user_by_id(&self, user_id: i64, auth_token: impl Into<String>) -> Option<UserStored> {
+    pub(crate) async fn get_user_by_id_old(&self, user_id: i64, auth_token: impl Into<String>) -> Option<UserStored> {
         let addr = &self.socket_addr;
 
         let get_response = self.client
@@ -123,6 +130,25 @@ impl TestContext {
                 .header("cookie", auth_token.into())
                 .body(Body::empty())
                 .unwrap())
+            .await
+            .unwrap();
+
+        assert_eq!(get_response.status(), StatusCode::OK);
+
+        // asynchronously aggregate the chunks of the body
+        let body = get_response.collect().await.unwrap().aggregate();
+
+        // try to parse as json with serde_json
+        let user: UserStored = serde_json::from_reader(body.reader()).unwrap();
+
+        Some(user)
+    }
+
+    pub(crate) async fn get_user_by_id(&self, user_id: i64, auth_token: impl Into<String>) -> Option<UserStored> {
+        let path = format!("/get-by-id/{user_id}");
+
+        let get_response = self.client
+            .request(self.get_builder(path))
             .await
             .unwrap();
 
@@ -151,7 +177,7 @@ impl TestContext {
             .unwrap();
     }
 
-    pub(crate) async fn sign_in_user(&self, user_body: UserForSignIn) -> Option<String> {
+    pub(crate) async fn sign_in_user(&mut self, user_body: UserForSignIn) -> Option<String> {
         let addr = &self.socket_addr;
 
         let post_response = self.client
@@ -172,12 +198,27 @@ impl TestContext {
         println!("-----------------------sc: {:?}", sc);
 
         if let Some(hv) = sc {
-            let hv_str = hv.to_str().unwrap();
-            println!("-----------------------hv_str: {:?}", hv_str);
+            let hv_str = hv.to_str().unwrap().to_string();
+            println!("-----------------------hv_str: {:?}", &hv_str);
+            self.auth_token = Some(hv_str.clone());
             Some(hv_str.to_string())
         } else {
             None
         }
+    }
+
+    fn get_builder(&self, path: impl Into<String>) -> Request<Body> {
+        let addr = &self.socket_addr;
+        let auth_token = &self.auth_token.clone().unwrap_or("".to_string());
+        let path: String = path.into();
+
+        Request::builder()
+            .method(http::Method::GET)
+            .uri(format!("http://{addr}{path}"))
+            .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+            .header("cookie", auth_token)
+            .body(Body::empty())
+            .unwrap()
     }
 }
 
