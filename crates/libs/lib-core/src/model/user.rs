@@ -9,7 +9,6 @@ use tokio_postgres::{Error, Row};
 use tokio_postgres::types::ToSql;
 use uuid::Uuid;
 use crate::model::store;
-use crate::model::store::TimestampWithTimeZone;
 
 #[derive(Debug, Deserialize, Serialize, Builder)]
 pub struct UserForCreate {
@@ -18,7 +17,6 @@ pub struct UserForCreate {
     pub first_name: String,
     pub last_name: String,
 }
-
 
 impl UserForCreate {
     pub fn new(
