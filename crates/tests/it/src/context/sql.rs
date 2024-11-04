@@ -15,10 +15,10 @@ CREATE TABLE "users" (
   -- Auth
   pwd varchar(256),
   pwd_salt varchar(128) NOT NULL ,
-  token_salt varchar(128) NOT NULL
+  token_salt varchar(128) NOT NULL,
 
   -- Timestamps
-  -- created_at timestamp with time zone NOT NULL,
-  -- updated_at timestamp with time zone NOT NULL
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now()
 );
 "#;

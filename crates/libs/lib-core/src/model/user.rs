@@ -1,5 +1,6 @@
 use std::str::FromStr;
 use std::time::SystemTime;
+use chrono::{DateTime, Utc};
 use derive_builder::Builder;
 use modql::field::Fields;
 use serde::{Deserialize, Serialize};
@@ -8,6 +9,7 @@ use tokio_postgres::{Error, Row};
 use tokio_postgres::types::ToSql;
 use uuid::Uuid;
 use crate::model::store;
+use crate::model::store::TimestampWithTimeZone;
 
 #[derive(Debug, Deserialize, Serialize, Builder)]
 pub struct UserForCreate {
@@ -94,6 +96,8 @@ pub struct UserStored {
     pub first_name: String,
     pub last_name: String,
     pub pwd: String, // todo remove
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl TryFrom<&Row> for UserStored {
@@ -106,6 +110,8 @@ impl TryFrom<&Row> for UserStored {
             first_name: row.try_get("first_name")?,
             last_name: row.try_get("last_name")?,
             pwd: row.try_get("pwd")?,
+            created_at: row.try_get("created_at")?,
+            updated_at: row.try_get("updated_at")?,
         })
     }
 }

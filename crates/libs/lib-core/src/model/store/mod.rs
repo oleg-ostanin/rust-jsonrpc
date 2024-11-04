@@ -1,12 +1,17 @@
 pub mod user;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 // region:    --- Modules
 
 pub(in crate::model) mod dbx;
 
+
+
+
+use chrono::{DateTime, Utc, NaiveDateTime};
 // use crate::core_config;
+use tokio_postgres::types::{FromSql, Type};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
@@ -75,5 +80,23 @@ impl From<uuid::Error> for Error {
 impl From<pwd::Error> for Error {
     fn from(_: pwd::Error) -> Self {
         Error::FailedToHash
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct TimestampWithTimeZone(DateTime<Utc>);
+
+impl<'a> FromSql<'a> for TimestampWithTimeZone {
+    fn from_sql(ty: &Type, raw: &'a [u8]) -> core::result::Result<Self, Box<dyn std::error::Error + Sync + Send>> {
+        if ty.name() == "timestamp" {
+            let naive_datetime: NaiveDateTime = NaiveDateTime::from_sql(ty, raw).unwrap();
+            Ok(TimestampWithTimeZone(DateTime::from_utc(naive_datetime, Utc)))
+        } else {
+            Err("Unexpected column type".into())
+        }
+    }
+
+    fn accepts(ty: &Type) -> bool {
+        ty.name() == "timestamp"
     }
 }
