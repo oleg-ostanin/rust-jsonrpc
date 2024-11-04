@@ -1,2 +1,1 @@
-mod dev;
-mod temp;
+mod auth;
