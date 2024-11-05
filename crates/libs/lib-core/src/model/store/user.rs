@@ -38,7 +38,6 @@ SELECT * FROM users WHERE identity=$1;
 "#;
 
 impl UserBmc {
-
     pub async fn create(
         mm: &ModelManager,
         user: UserForCreate,
@@ -50,31 +49,11 @@ impl UserBmc {
         };
 
         let pwd_hashed = hash_pwd(to_hash).await?;
-            //.map_err(|_| Error::FailedToHash)?;
 
-        //pwd: "IzAyIyRhcmdvbjJpZCR2PTE5JG09MTk0NTYsdD0yLHA9MSQ4RjZKWWRhdFFJYWVlS2JlQmw1VVV3JHpYUkxkRm1wS3BwUTRvTXRXcktsdkFEcVdGNUJKSnZXcCtyS2FKZ1V2czg"
-        //let encoded = b64u_encode(pwd_hashed);
-        //let token_salt = Uuid::new_v4().to_string();
-        let token_salt = "f05e8961-d6ad-4086-9e78-a6de065e5453".to_string();
+        let token_salt = Uuid::new_v4().to_string();
 
-        //let res = db_client.execute(&statement, &[&user.uuid, &user.pass]).await?;
-        // todo try to store uuid instead of string
         Ok(mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
             &user.last_name, &pwd_hashed, &pwd_salt.to_string(), &token_salt]).await?)
-
-        // todo propagate error
-        // let result = match res {
-        //     Ok(val) => {
-        //         println!("{:?}", val);
-        //         Ok(val)
-        //     }
-        //     Err(e) => {
-        //         println!("{:?}", e);
-        //         Err(e)
-        //     }
-        // };
-        //
-        // Ok(0)
     }
 
     pub async fn get_by_id(

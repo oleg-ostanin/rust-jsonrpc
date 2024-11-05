@@ -12,7 +12,7 @@ use std::sync::Arc;
 use tracing::debug;
 use uuid::Uuid;
 
-pub async fn mw_reponse_map(
+pub async fn mw_response_map(
 	ctx: Option<CtxW>,
 	uri: Uri,
 	req_method: Method,
@@ -21,7 +21,7 @@ pub async fn mw_reponse_map(
 ) -> Response {
 	let ctx = ctx.map(|ctx| ctx.0);
 
-	debug!("{:<12} - mw_reponse_map", "RES_MAPPER");
+	debug!("{:<12} - mw_response_map", "RES_MAPPER");
 	let uuid = Uuid::new_v4();
 
 	let rpc_info = res.extensions().get::<Arc<RpcInfo>>().map(Arc::as_ref);
@@ -30,7 +30,7 @@ pub async fn mw_reponse_map(
 	let web_error = res.extensions().get::<Arc<Error>>().map(Arc::as_ref);
 	let client_status_error = web_error.map(|se| se.client_status_and_error());
 
-	// -- If client error, build the new reponse.
+	// -- If client error, build the new response.
 	let error_response =
 		client_status_error
 			.as_ref()

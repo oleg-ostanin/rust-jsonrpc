@@ -2,8 +2,9 @@ use core::net::SocketAddr;
 use std::sync::Arc;
 
 use axum::{body::Body, Error, http::{self, Request, StatusCode}};
+use axum::response::Response;
 use http_body_util::BodyExt;
-use hyper::body::Buf;
+use hyper::body::{Buf, Incoming};
 use hyper_util::client::legacy::Client;
 use hyper_util::client::legacy::connect::HttpConnector;
 // for `collect`
@@ -163,18 +164,17 @@ impl TestContext {
         Some(user)
     }
 
-    pub(crate) async fn create_user(&self, user_body: UserForCreate) {
+    pub(crate) async fn create_user(&self, user_body: &UserForCreate) -> Response<Incoming> {
         let addr = &self.socket_addr;
 
-        let post_response = self.client
-            .request(Request::builder()
+        self.client.request(Request::builder()
                 .method(http::Method::POST)
                 .uri(format!("http://{addr}/sign-up"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
                 .body(Body::from(serde_json::to_string(&json!(user_body)).unwrap()))
                 .unwrap())
             .await
-            .unwrap();
+            .unwrap()
     }
 
     pub(crate) async fn sign_in_user(&mut self, user_body: UserForSignIn) -> Option<String> {
