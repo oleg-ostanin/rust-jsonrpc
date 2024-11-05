@@ -17,6 +17,8 @@ use lib_core::context::app_context::ModelManager;
 use lib_core::model::user::UserForCreate;
 use crate::handlers::handlers_login::api_login_handler;
 use crate::middleware::mw_auth::{mw_ctx_require, mw_ctx_resolver};
+use crate::middleware::mw_req_stamp::mw_req_stamp_resolver;
+use crate::middleware::mw_res_map::mw_reponse_map;
 use super::super::handlers::signup::sign_up;
 use super::super::handlers::admin::get_by_id;
 
@@ -39,9 +41,10 @@ pub async fn app_nils(app_context: Arc<ModelManager>) -> Router {
         .route("/get-books", get(get_books))
         .route("/sign-in", post(api_login_handler))
         .route("/sign-up", post(sign_up))
-        //.route("/get-by-id/:user_id", get(get_by_id))
+        .layer(middleware::map_response(mw_reponse_map))
         .layer(middleware::from_fn_with_state(app_context.clone(), mw_ctx_resolver))
         .layer(CookieManagerLayer::new())
+        .layer(middleware::from_fn(mw_req_stamp_resolver))
         .with_state(app_context)
 }
 
