@@ -171,6 +171,7 @@ impl TestContext {
                 .method(http::Method::POST)
                 .uri(format!("http://{addr}/sign-up"))
                 .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
+                .header("meta-cookie", "create_user")
                 .body(Body::from(serde_json::to_string(&json!(user_body)).unwrap()))
                 .unwrap())
             .await

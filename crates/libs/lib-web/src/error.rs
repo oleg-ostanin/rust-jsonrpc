@@ -9,6 +9,7 @@ use serde_json::Value;
 use serde_with::{serde_as, DisplayFromStr};
 use std::sync::Arc;
 use tracing::{debug, warn};
+use lib_core::model::store::Error::StoreError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -16,6 +17,8 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[derive(Debug, Serialize, From, strum_macros::AsRefStr)]
 #[serde(tag = "type", content = "data")]
 pub enum Error {
+	UserExists,
+
 	// -- Login
 	LoginFailUsernameNotFound,
 	LoginFailUserHasNoPwd {
@@ -41,6 +44,9 @@ pub enum Error {
 	Token(token::Error),
 	#[from]
 	Rpc(lib_rpc_core::Error),
+
+	#[from]
+	ModelStore(lib_core::model::store::Error),
 
 	// -- RpcError (deconstructed from rpc_router::Error)
 	// Simple mapping for the RpcRequestParsingError. It will have the eventual id, method context.

@@ -15,8 +15,8 @@ mod tests {
         let response = ctx.create_user(&user_to_create).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        //let response = ctx.create_user(&user_to_create).await;
-        //println!("{:?}", &response);
+        let response = ctx.create_user(&user_to_create).await;
+        println!("error: {:?}", &response);
 
         assert_eq!(response.status(), StatusCode::OK);
 

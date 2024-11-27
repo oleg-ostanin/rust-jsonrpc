@@ -60,8 +60,14 @@ pub async fn mw_ctx_resolver(
 
 async fn ctx_resolve(mm: Arc<ModelManager>, cookies: &Cookies) -> CtxExtResult {
 	let token = cookies.get("auth-token");
+	let meta_cookie_opt = cookies.get("meta-cookie");
+	let meta_cookie = match meta_cookie_opt {
+		None => "no_meta_cookie".to_string(),
+		Some(c) => c.value().to_string(),
+	};
 
-	println!("{:?}", token);
+	println!("token = {:?}", token);
+	println!("meta-cookie = {:?}", &meta_cookie);
 
 	// -- Get Token String
 	let token = cookies
@@ -89,7 +95,7 @@ async fn ctx_resolve(mm: Arc<ModelManager>, cookies: &Cookies) -> CtxExtResult {
 		.map_err(|_| CtxExtError::CannotSetTokenCookie)?;
 
 	// -- Create CtxExtResult
-	Ctx::new(user.id)
+	Ctx::new(user.id, meta_cookie)
 		.map(CtxW)
 		.map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
 }

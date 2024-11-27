@@ -67,7 +67,15 @@ impl std::error::Error for Error {}
 
 impl From<tokio_postgres::Error> for Error {
     fn from(value: tokio_postgres::Error) -> Self {
-        Error::StoreError(value.to_string())
+        println!("{:?}", &value);
+
+        if let Some(db_error) = value.as_db_error() {
+            let message = db_error.message();
+            if message.contains("violates unique constraint") {
+                return Error::StoreError("Entity already exists".to_string())
+            }
+        };
+        Error::StoreError("undefined".to_string())
     }
 }
 

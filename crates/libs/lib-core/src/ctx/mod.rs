@@ -10,6 +10,7 @@ pub use self::error::{Error, Result};
 #[derive(Clone, Debug)]
 pub struct Ctx {
 	user_id: i64,
+	meta_cookie: String, //todo delete
 
 	/// Note: For the future ACS (Access Control System)
 	conv_id: Option<i64>,
@@ -20,16 +21,18 @@ impl Ctx {
 	pub fn root_ctx() -> Self {
 		Ctx {
 			user_id: 0,
+			meta_cookie: "root_ctx_meta".to_string(),
 			conv_id: None,
 		}
 	}
 
-	pub fn new(user_id: i64) -> Result<Self> {
+	pub fn new(user_id: i64, meta_cookie: String) -> Result<Self> {
 		if user_id == 0 {
 			Err(Error::CtxCannotNewRootCtx)
 		} else {
 			Ok(Self {
 				user_id,
+				meta_cookie,
 				conv_id: None,
 			})
 		}
