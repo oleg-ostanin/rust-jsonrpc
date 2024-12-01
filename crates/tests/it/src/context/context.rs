@@ -145,18 +145,23 @@ impl TestContext {
         Some(user)
     }
 
-    pub(crate) async fn get_user_by_id(&self, user_id: i64, auth_token: impl Into<String>) -> Option<UserStored> {
+    pub(crate) async fn get_user_response_by_id(&self, user_id: i64) -> Response<Incoming> {
         let path = format!("/get-by-id/{user_id}");
 
-        let get_response = self.client
+        self.client
             .request(self.get_builder(path))
             .await
-            .unwrap();
+            .unwrap()
+    }
 
-        assert_eq!(get_response.status(), StatusCode::OK);
+    pub(crate) async fn get_user_by_id(&self, user_id: i64) -> Option<UserStored> {
+        let response = self.get_user_response_by_id(user_id).await;
+        Self::user_from_response(response).await
+    }
 
+    async fn user_from_response(response: Response<Incoming>) -> Option<UserStored> {
         // asynchronously aggregate the chunks of the body
-        let body = get_response.collect().await.unwrap().aggregate();
+        let body = response.collect().await.unwrap().aggregate();
 
         // try to parse as json with serde_json
         let user: UserStored = serde_json::from_reader(body.reader()).unwrap();

@@ -15,6 +15,9 @@ mod tests {
     #[tokio::test]
     async fn nils_second_att() {
         let mut ctx = TestContext::new().await;
+
+        //let no_token_response = ctx.get_user_by_id(1).await;
+
         let user_to_create = UserForCreate::new("2128506", "pwd", "John", "Doe");
         let response = ctx.create_user(&user_to_create).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -36,7 +39,7 @@ mod tests {
 
         let auth_token = ctx.sign_in_user(user_body).await;
         assert!(auth_token.is_some());
-        ctx.get_user_by_id(1, auth_token.unwrap()).await;
+        ctx.get_user_by_id(1).await;
     }
 
 }
