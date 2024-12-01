@@ -74,7 +74,7 @@ impl TestContext {
 
         init_db(&pg_client).await;
 
-        let app_context: Arc<ModelManager> = Arc::new(ModelManager::create(Arc::new(pg_client)).await);
+        let app_context: Arc<ModelManager> = Arc::new(ModelManager::create(Arc::new(pg_client)));
 
         let app = app_nils(app_context).await;
 

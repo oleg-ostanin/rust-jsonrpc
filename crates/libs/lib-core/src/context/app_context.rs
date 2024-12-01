@@ -11,7 +11,7 @@ pub struct ModelManager {
 }
 
 impl ModelManager {
-    pub async fn create(client: Arc<Client>) -> ModelManager {
+    pub fn create(client: Arc<Client>) -> ModelManager {
         ModelManager {
             client
         }

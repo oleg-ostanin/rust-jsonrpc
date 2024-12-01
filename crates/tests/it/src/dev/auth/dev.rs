@@ -16,7 +16,12 @@ mod tests {
     async fn nils_second_att() {
         let mut ctx = TestContext::new().await;
 
-        //let no_token_response = ctx.get_user_by_id(1).await;
+        let no_token_response = ctx.get_user_response_by_id(1).await;
+        println!("no_token_response: {:?}", &no_token_response);
+        assert_eq!(no_token_response.status(), StatusCode::FORBIDDEN);
+        let body = no_token_response.collect().await.unwrap().aggregate();
+        let no_token_result: Value = serde_json::from_reader(body.reader()).unwrap();
+        println!("no_token_result: {:?}", &no_token_result);
 
         let user_to_create = UserForCreate::new("2128506", "pwd", "John", "Doe");
         let response = ctx.create_user(&user_to_create).await;

@@ -4,13 +4,14 @@
 use std::fs::File;
 use std::io::BufReader;
 use std::ops::Deref;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, OnceLock, RwLock};
 
 use axum::{extract::{Json, State}, middleware, Router, routing::{get, post}};
 use axum::http::StatusCode;
 use java_properties::read;
 use tokio_postgres::{Client, NoTls};
 use tower_cookies::{CookieManagerLayer, Cookies};
+use tracing::debug;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use lib_core::context::app_context::ModelManager;
@@ -26,7 +27,7 @@ pub async fn create_app_context() -> Arc<ModelManager> {
     let db_url = read_db_url("local.properties");
     let client = get_client(db_url).await;
 
-    let app_context: Arc<ModelManager> = Arc::new(ModelManager::create(Arc::new(client)).await);
+    let app_context: Arc<ModelManager> = Arc::new(ModelManager::create(Arc::new(client)));
 
     app_context
 }
