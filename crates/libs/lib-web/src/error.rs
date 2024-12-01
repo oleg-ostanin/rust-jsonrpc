@@ -9,15 +9,32 @@ use serde_json::Value;
 use serde_with::{serde_as, DisplayFromStr};
 use std::sync::Arc;
 use tracing::{debug, warn};
-use lib_core::model::store::Error::StoreError;
+use lib_core::model::store::Error as StoreError;
 
 pub type Result<T> = core::result::Result<T, Error>;
+
+// impl From<StoreError> for Error {
+// 	fn from(value: model::store::Error) -> Self {
+// 		match value {
+// 			StoreError::StoreError(message) => {
+// 				if message.contains("already exists") {
+// 					return Self::EntityExists
+// 				}
+// 				else { return Self::ModelStore(StoreError::Undefined) }
+// 			},
+// 			StoreError::NotFound => { Self::ModelStore(StoreError::NotFound) }
+// 			StoreError::FailedToHash => { Self::ModelStore(StoreError::FailedToHash)}
+// 			_ => { Self::ModelStore(StoreError::Undefined) }
+// 		}
+// 	}
+// }
 
 #[serde_as]
 #[derive(Debug, Serialize, From, strum_macros::AsRefStr)]
 #[serde(tag = "type", content = "data")]
 pub enum Error {
-	UserExists,
+	#[from]
+	EntityExists(lib_core::model::store::Error),
 
 	// -- Login
 	LoginFailUsernameNotFound,
@@ -45,8 +62,8 @@ pub enum Error {
 	#[from]
 	Rpc(lib_rpc_core::Error),
 
-	#[from]
-	ModelStore(lib_core::model::store::Error),
+	// #[from]
+	// ModelStore(lib_core::model::store::Error),
 
 	// -- RpcError (deconstructed from rpc_router::Error)
 	// Simple mapping for the RpcRequestParsingError. It will have the eventual id, method context.
@@ -146,6 +163,18 @@ impl Error {
 		use Error::*; // TODO: should change to `use web::Error as E`
 
 		match self {
+			// -- Sign up
+			EntityExists(store_error) => {
+				match store_error {
+					StoreError::EntityExists => {}
+					StoreError::StoreError(_) => {}
+					StoreError::NotFound => {}
+					StoreError::FailedToHash => {}
+					StoreError::Undefined => {}
+				}
+				(StatusCode::BAD_REQUEST, ClientError::USER_EXISTS)
+			},
+
 			// -- Login
 			LoginFailUsernameNotFound
 			| LoginFailUserHasNoPwd { .. }
@@ -208,6 +237,7 @@ impl Error {
 #[serde(tag = "message", content = "detail")]
 #[allow(non_camel_case_types)]
 pub enum ClientError {
+	USER_EXISTS,
 	LOGIN_FAIL,
 	NO_AUTH,
 	ENTITY_NOT_FOUND { entity: &'static str, id: i64 },

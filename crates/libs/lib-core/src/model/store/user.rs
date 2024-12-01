@@ -41,7 +41,7 @@ impl UserBmc {
     pub async fn create(
         mm: &ModelManager,
         user: UserForCreate,
-    ) -> Result<u64> {
+    ) -> Result<()> {
         let pwd_salt = Uuid::new_v4();
         let to_hash = ContentToHash {
             content: user.password.clone(),
@@ -52,8 +52,10 @@ impl UserBmc {
 
         let token_salt = Uuid::new_v4().to_string();
 
-        Ok(mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
-            &user.last_name, &pwd_hashed, &pwd_salt.to_string(), &token_salt]).await?)
+        mm.client().execute(INSERT_USER, &[&user.identity, &user.first_name,
+            &user.last_name, &pwd_hashed, &pwd_salt.to_string(), &token_salt]).await?;
+
+        Ok(())
     }
 
     pub async fn get_by_id(

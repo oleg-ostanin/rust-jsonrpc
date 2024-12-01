@@ -4,7 +4,11 @@ use tower::{Service, ServiceExt};
 
 #[cfg(test)]
 mod tests {
+    use http_body_util::BodyExt;
+    use hyper::body::Buf;
+    use tower::{Service, ServiceExt};
     use axum::http::StatusCode;
+    use serde_json::Value;
     use lib_core::model::user::{UserForCreate, UserForLogin, UserForSignIn};
     use crate::context::context::TestContext;
 
@@ -18,7 +22,15 @@ mod tests {
         let response = ctx.create_user(&user_to_create).await;
         println!("error: {:?}", &response);
 
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        // asynchronously aggregate the chunks of the body
+        let body = response.collect().await.unwrap().aggregate();
+
+        // try to parse as json with serde_json
+        let bad_request_result: Value = serde_json::from_reader(body.reader()).unwrap();
+
+        println!("bad_request_res: {:?}", &bad_request_result);
+
 
         let user_body = UserForSignIn::new("2128506", "pwd");
 

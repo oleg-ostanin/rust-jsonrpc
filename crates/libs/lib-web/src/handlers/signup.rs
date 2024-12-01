@@ -16,10 +16,7 @@ pub async fn sign_up(
     State(app_context): State<Arc<ModelManager>>,
     cookies: Cookies,
     Json(payload): Json<UserForCreate>,
-) -> crate::error::Result<String> {
+) -> crate::error::Result<()> {
     println!("{:?}", payload);
-    match UserBmc::create(app_context.deref(), payload).await {
-        Ok(id) => Ok(id.to_string()),
-        Err(e) => Err(Error::UserExists) // todo more clear status code
-    }
+    Ok(UserBmc::create(app_context.deref(), payload).await?)
 }

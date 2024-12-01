@@ -30,9 +30,9 @@ pub async fn mw_response_map(
 	// -- Get the eventual response error.
 	let web_error = res.extensions().get::<Arc<Error>>().map(Arc::as_ref);
 
-	if let Some(we) = web_error {
-		panic!()
-	}
+	// if let Some(we) = web_error {
+	// 	panic!()
+	// }
 
 	let client_status_error = web_error.map(|se| se.client_status_and_error());
 

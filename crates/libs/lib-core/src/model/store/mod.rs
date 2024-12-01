@@ -45,9 +45,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug, Serialize)]
 pub enum Error {
+    EntityExists,
     StoreError(String),
     NotFound,
     FailedToHash,
+    Undefined,
 }
 
 // region:    --- Error Boilerplate
