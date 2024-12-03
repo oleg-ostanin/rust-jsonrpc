@@ -120,31 +120,6 @@ impl TestContext {
         assert_eq!(get_response.status(), StatusCode::OK);
     }
 
-    pub(crate) async fn get_user_by_id_old(&self, user_id: i64, auth_token: impl Into<String>) -> Option<UserStored> {
-        let addr = &self.socket_addr;
-
-        let get_response = self.client
-            .request(Request::builder()
-                .method(http::Method::GET)
-                .uri(format!("http://{addr}/get-by-id/{user_id}"))
-                .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
-                .header("cookie", auth_token.into())
-                .body(Body::empty())
-                .unwrap())
-            .await
-            .unwrap();
-
-        assert_eq!(get_response.status(), StatusCode::OK);
-
-        // asynchronously aggregate the chunks of the body
-        let body = get_response.collect().await.unwrap().aggregate();
-
-        // try to parse as json with serde_json
-        let user: UserStored = serde_json::from_reader(body.reader()).unwrap();
-
-        Some(user)
-    }
-
     pub(crate) async fn get_user_response_by_id(&self, user_id: i64) -> Response<Incoming> {
         let path = format!("/get-by-id/{user_id}");
 
@@ -160,12 +135,8 @@ impl TestContext {
     }
 
     async fn user_from_response(response: Response<Incoming>) -> Option<UserStored> {
-        // asynchronously aggregate the chunks of the body
         let body = response.collect().await.unwrap().aggregate();
-
-        // try to parse as json with serde_json
         let user: UserStored = serde_json::from_reader(body.reader()).unwrap();
-
         Some(user)
     }
 
@@ -183,10 +154,10 @@ impl TestContext {
             .unwrap()
     }
 
-    pub(crate) async fn sign_in_user(&mut self, user_body: UserForSignIn) -> Option<String> {
+    pub(crate) async fn sign_in_user(&mut self, user_body: UserForSignIn) -> Response<Incoming> {
         let addr = &self.socket_addr;
 
-        let post_response = self.client
+        self.client
             .request(Request::builder()
                 .method(http::Method::POST)
                 .uri(format!("http://{addr}/sign-in"))
@@ -194,18 +165,13 @@ impl TestContext {
                 .body(Body::from(serde_json::to_string(&json!(user_body)).unwrap()))
                 .unwrap())
             .await
-            .unwrap();
+            .unwrap()
+    }
 
-
-        println!("post response: {:?}", &post_response);
-        println!("headers: {:?}", &post_response.headers());
-
-        let sc = post_response.headers().get("set-cookie");
-        println!("-----------------------sc: {:?}", sc);
-
+    pub(crate) async fn get_auth_cookie(&mut self, sign_in_response: Response<Incoming>) -> Option<String> {
+        let sc = sign_in_response.headers().get("set-cookie");
         if let Some(hv) = sc {
             let hv_str = hv.to_str().unwrap().to_string();
-            println!("-----------------------hv_str: {:?}", &hv_str);
             self.auth_token = Some(hv_str.clone());
             Some(hv_str.to_string())
         } else {
