@@ -1,5 +1,10 @@
+use axum::response::Response;
+use http_body_util::BodyExt;
+use hyper::body::Buf;
+use hyper::body::Incoming;
 use serde::Deserialize;
 use serde_json::Value;
+use tower::Service;
 
 #[derive(Deserialize)]
 struct ErrorDetail {
@@ -17,6 +22,12 @@ struct ErrorData {
 struct ErrorResponse {
     error: ErrorDetail,
     id: Option<String>,
+}
+
+pub(crate) async fn message_from_response(response: Response<Incoming>) -> String {
+    let body = response.collect().await.unwrap().aggregate();
+    let json_value: Value = serde_json::from_reader(body.reader()).unwrap();
+    get_message(json_value)
 }
 
 pub(crate) fn get_message(json: Value) -> String {

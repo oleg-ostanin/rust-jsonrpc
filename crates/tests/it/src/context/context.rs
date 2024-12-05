@@ -99,6 +99,10 @@ impl TestContext {
         }
     }
 
+    pub(crate) fn invalidate_token(&mut self) -> Option<String> {
+        self.auth_token.take()
+    }
+
     pub(crate) async fn get_books(&self) -> () {
         let addr = &self.socket_addr;
 
@@ -168,7 +172,7 @@ impl TestContext {
             .unwrap()
     }
 
-    pub(crate) async fn get_auth_cookie(&mut self, sign_in_response: Response<Incoming>) -> Option<String> {
+    pub(crate) async fn get_auth_cookie(&mut self, sign_in_response: &Response<Incoming>) -> Option<String> {
         let sc = sign_in_response.headers().get("set-cookie");
         if let Some(hv) = sc {
             let hv_str = hv.to_str().unwrap().to_string();
