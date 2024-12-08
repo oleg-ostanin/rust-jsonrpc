@@ -11,7 +11,9 @@ members = [
     "crates/libs/lib-web",
     # -- Application Services
     "crates/services/web-server",
+    # -- Tests
     "crates/tests/it",
+    "crates/tests/edu",
 ]
 
 # NOTE: Only the crates that are utilized in two or more sub-crates and benefit from global management
