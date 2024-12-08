@@ -3,11 +3,14 @@ macro_rules! all_true {
     ( $( $x:expr ),* ) => {
         {
             let mut res = true;
+            'block: {
             $(
                 if(!$x) {
                     res = false;
+                    break 'block;
                 }
             )*
+            }
             res
         }
     };
