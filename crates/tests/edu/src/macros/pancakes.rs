@@ -1,11 +1,19 @@
-use procedural_macro::HelloMacro;
+use procedural_macro::{HelloMacro};
+use builder_macro::{HelloBuilder};
 
 pub trait HelloMacro {
     fn hello_macro();
 }
 
+pub trait HelloBuilder {
+    fn hello_builder();
+}
+
 #[derive(HelloMacro)]
 struct Pancakes;
+
+#[derive(HelloBuilder)]
+struct NilsCakes;
 
 #[cfg(test)]
 mod tests {
@@ -14,5 +22,6 @@ mod tests {
     #[test]
     fn test() {
         Pancakes::hello_macro();
+        NilsCakes::hello_builder();
     }
 }

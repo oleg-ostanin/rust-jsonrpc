@@ -14,6 +14,7 @@ members = [
     # -- Tests
     "crates/tests/it",
     "crates/tests/edu",
+    "crates/tests/builder-macro",
     "crates/tests/procedural-macro",
 ]
 

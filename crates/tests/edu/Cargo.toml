@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 procedural-macro = { path = "../procedural-macro"}
+builder-macro = { path = "../builder-macro"}
