@@ -31,7 +31,7 @@ fn expanded() {
 
 #[cfg(test)]
 mod tests {
-    use crate::macros::hw::{always_true, equals};
+    use crate::macros::all_true::{always_true, equals};
 
     #[test]
     fn check_macro() {

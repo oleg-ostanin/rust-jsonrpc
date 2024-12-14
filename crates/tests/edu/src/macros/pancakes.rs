@@ -13,7 +13,9 @@ pub trait HelloBuilder {
 struct Pancakes;
 
 #[derive(HelloBuilder)]
-struct NilsCakes;
+struct NilsCakes {
+    food: String,
+}
 
 #[cfg(test)]
 mod tests {

@@ -13,6 +13,7 @@ pub fn builder_macro_derive(input: TokenStream) -> TokenStream {
 
 fn impl_hello_builder(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
+    let data = &ast.data;
     let gen = quote! {
         impl HelloBuilder for #name {
             fn hello_builder() {
@@ -21,4 +22,23 @@ fn impl_hello_builder(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
     gen.into()
+}
+
+macro_rules! make_public{
+    (
+     $vis:vis struct $struct_name:ident {
+        $(
+        // vis for field visibility, ident for field name and ty for field data type
+        $field_vis:vis $field_name:ident : $field_type:ty
+        ),*
+    }
+    ) => {
+        {
+            pub struct $struct_name{
+                $(
+                pub $field_name : $field_type,
+                )*
+            }
+        }
+    }
 }
