@@ -1,7 +1,7 @@
 
 #[derive(Default, Debug, Clone)]
 pub(crate) struct Types {
-    num: i32,
+    pub(crate) num: i32,
     num_option: Option<i32>,
     line: String,
     pub(crate) line_option: Option<String>,
