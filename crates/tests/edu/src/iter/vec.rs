@@ -1,4 +1,4 @@
-use crate::iter::common::Types;
+use crate::common::Types;
 
 fn default_vec(size: usize) -> Vec<Types> {
     let mut res = Vec::new();

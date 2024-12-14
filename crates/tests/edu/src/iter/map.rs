@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::iter::common::Types;
+use crate::common::Types;
 
 fn default_map(size: usize) -> HashMap<i32, Types> {
     let mut res = HashMap::new();
