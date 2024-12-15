@@ -13,7 +13,7 @@ fn default_map(size: usize) -> HashMap<i32, Types> {
 mod tests {
     use std::collections::HashMap;
     use std::mem;
-    use crate::iter::common::Types;
+    use crate::common::Types;
     use crate::iter::map::default_map;
 
     #[test]
