@@ -121,7 +121,7 @@ mod tests {
         assert_eq!(-3, res)
     }
 
-    // Doe not compile!
+    // Does not compile! see func_fn_l.rs for the solution
     // #[test]
     // fn vec_stack() {
     //     let add: fn(i32, i32) -> i32 = |a, b| a + b;
