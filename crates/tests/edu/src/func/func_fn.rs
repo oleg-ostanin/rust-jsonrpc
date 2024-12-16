@@ -46,8 +46,7 @@ mod tests {
         let add_instance = Calc::new(add);
         // does not compile!
         // let sum = add_instance.add_calc(3, 5);
-        let func = add_instance.calc;
-        let sum = func(3, 5);
+        let sum = (add_instance.calc)(3, 5);
         assert_eq!(8, sum)
     }
 
@@ -65,8 +64,7 @@ mod tests {
         vec.iter().enumerate().for_each(
             |(i, instance)| {
                 let value = values[i];
-                let func = instance.calc;
-                res = func(res, value);
+                res = (instance.calc)(res, value);
             }
         );
         assert_eq!(-3, res)
@@ -86,29 +84,60 @@ mod tests {
         vec.into_iter().enumerate().for_each(
             |(i, instance)| {
                 let value = values[i];
-                let func = instance.calc;
+                res = (instance.calc)(res, value);
+            }
+        );
+        assert_eq!(-3, res)
+    }
+
+    #[test]
+    fn vec_boxed_iter() {
+        let vec = calc_vec();
+        let values = vec![1, 2, 3];
+        let mut res = 0;
+        vec.iter().enumerate().for_each(
+            |(i, instance)| {
+                let value = values[i];
+                // does not compile, cannot move, need to borrow
+                //let func = instance.boxed_calc;
+                res = (instance.boxed_calc)(res, value);
+            }
+        );
+        assert_eq!(-3, res)
+    }
+
+    #[test]
+    fn vec_boxed_into_iter() {
+        let vec = calc_vec();
+        let values = vec![1, 2, 3];
+        let mut res = 0;
+        vec.into_iter().enumerate().for_each(
+            |(i, instance)| {
+                let value = values[i];
+                let func = instance.boxed_calc;
                 res = func(res, value);
             }
         );
         assert_eq!(-3, res)
     }
 
+    // Doe not compile!
     // #[test]
     // fn vec_stack() {
     //     let add: fn(i32, i32) -> i32 = |a, b| a + b;
-    //     let add_instance = Calc::new(add);
+    //     let add_instance = BoxedCalc::new(Box::new(add));
     //
     //     let on_the_stack = 42;
     //     let add_from_the_stack = |a, _| { a + on_the_stack};
     //
-    //     let on_the_stack_instance = Calc::new(add_from_the_stack);
+    //     let on_the_stack_instance = BoxedCalc::new(Box::new(add_from_the_stack));
     //     let vec = vec![add_instance, on_the_stack_instance];
     //     let values = vec![1, 2];
     //     let mut res = 0;
     //     vec.into_iter().enumerate().for_each(
     //         |(i, instance)| {
     //             let value = values[i];
-    //             let func = instance.calc;
+    //             let func = instance.boxed_calc;
     //             res = func(res, value);
     //         }
     //     );
