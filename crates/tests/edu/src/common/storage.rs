@@ -8,4 +8,8 @@ impl Storage {
     pub fn new() -> Self {
         Self { items: HashMap::new() }
     }
+
+    pub fn items(&self) -> &HashMap<u32, u32> {
+        &self.items
+    }
 }
