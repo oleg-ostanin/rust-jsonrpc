@@ -1,13 +1,3 @@
-struct Calc<T: Fn(i32, i32) -> i32> {
-    pub calc: T,
-}
-
-impl<T: Fn(i32, i32) -> i32> Calc<T> {
-    pub fn new(add_calc: T) -> Self {
-        Self { calc: add_calc }
-    }
-}
-
 struct BoxedCalc<'a> {
     pub boxed_calc: Box<(dyn Fn(i32, i32) -> i32 + 'a)>,
 }
