@@ -38,25 +38,26 @@ mod tests {
     use crate::common::processors::order_processor::OrderProcessor;
     use crate::common::storage::Storage;
 
+    fn check_storage() -> CheckStorageOrderProcessor {
+        let storage = Arc::new(Storage::default());
+        CheckStorageOrderProcessor::new(storage)
+    }
+
     #[test]
     fn enough() {
-        let storage = Arc::new(Storage::default());
         let mut items = HashMap::new();
         items.insert(2u32, 4);
         let order = Order::default_with_items(items);
-        let check = CheckStorageOrderProcessor::new(storage);
-        let res = check.process_order(order);
+        let res = check_storage().process_order(order);
         assert!(res.is_ok())
     }
 
     #[test]
     fn not_enough() {
-        let storage = Arc::new(Storage::default());
         let mut items = HashMap::new();
         items.insert(2u32, 5);
         let order = Order::default_with_items(items);
-        let check = CheckStorageOrderProcessor::new(storage);
-        let res = check.process_order(order);
+        let res = check_storage().process_order(order);
         assert!(res.is_err_and(|e| e == Error::NotEnoughItems ))
     }
 }
