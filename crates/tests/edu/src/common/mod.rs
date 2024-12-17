@@ -1,8 +1,8 @@
 pub mod order;
-pub mod order_processor;
 pub mod customer;
 pub mod storage;
 pub mod error;
+pub mod processors;
 
 #[derive(Default, Debug, Clone)]
 pub(crate) struct Types {

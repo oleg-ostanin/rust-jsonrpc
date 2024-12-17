@@ -17,3 +17,14 @@ impl Storage {
         &mut self.items
     }
 }
+
+impl Default for Storage {
+    fn default() -> Self {
+        let mut storage = Storage::new();
+        let mut items = storage.items_mut();
+        for i in 0..7 {
+            items.insert(i, i*2);
+        }
+        storage
+    }
+}
