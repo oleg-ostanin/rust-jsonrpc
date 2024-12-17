@@ -9,11 +9,11 @@ impl Storage {
         Self { items: HashMap::new() }
     }
 
-    // pub fn items(&self) -> &HashMap<u32, u32> {
-    //     &self.items
-    // }
+    pub fn items(&self) -> &HashMap<u32, u32> {
+        &self.items
+    }
 
-    pub fn items(&mut self) -> &mut HashMap<u32, u32> {
+    pub fn items_mut(&mut self) -> &mut HashMap<u32, u32> {
         &mut self.items
     }
 }

@@ -5,7 +5,7 @@ use crate::common::storage::Storage;
 fn default_storage(num: u32) -> Storage {
     let mut storage = Storage::new();
 
-    let mut items = storage.items();
+    let mut items = storage.items_mut();
     for i in 0..num {
         items.insert(i, i*2);
     }
